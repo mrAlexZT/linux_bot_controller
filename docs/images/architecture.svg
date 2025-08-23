@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="420" viewBox="0 0 980 420">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#555" />
+    </marker>
+    <style>
+      .box { fill:#f7fafc; stroke:#555; stroke-width:1.5; rx:8; ry:8; }
+      .title { font: 600 16px Arial, Helvetica, sans-serif; fill:#222; }
+      .small { font: 400 13px Arial, Helvetica, sans-serif; fill:#333; }
+      .label { font: 600 14px Arial, Helvetica, sans-serif; fill:#333; }
+      .line { stroke:#555; stroke-width:1.5; marker-end:url(#arrow); }
+    </style>
+  </defs>
+
+  <!-- Title -->
+  <text x="20" y="28" class="title">Telegram Remote Control Bot – High-level Architecture</text>
+
+  <!-- Left: Telegram -->
+  <rect x="40" y="80" width="180" height="80" class="box"/>
+  <text x="60" y="110" class="label">Telegram</text>
+  <text x="60" y="134" class="small">Users / Chats</text>
+
+  <!-- Center: Bot (aiogram) -->
+  <rect x="270" y="60" width="240" height="120" class="box"/>
+  <text x="290" y="92" class="label">Bot (aiogram v3)</text>
+  <text x="290" y="116" class="small">Dispatcher, Router</text>
+  <text x="290" y="136" class="small">Polling + ParseMode</text>
+
+  <!-- Middleware -->
+  <rect x="540" y="40" width="200" height="80" class="box"/>
+  <text x="560" y="72" class="label">AdminOnlyMiddleware</text>
+  <text x="560" y="96" class="small">Access control + DI Settings</text>
+
+  <!-- Handlers -->
+  <rect x="540" y="140" width="200" height="120" class="box"/>
+  <text x="560" y="170" class="label">Handlers</text>
+  <text x="560" y="194" class="small">/sh, !cmd, /ls, /cat,</text>
+  <text x="560" y="214" class="small">/download, /upload, /sysinfo, /power</text>
+
+  <!-- Utils -->
+  <rect x="770" y="160" width="180" height="100" class="box"/>
+  <text x="790" y="192" class="label">Utils</text>
+  <text x="790" y="216" class="small">run_shell(), previews,</text>
+  <text x="790" y="236" class="small">human_bytes()</text>
+
+  <!-- OS -->
+  <rect x="770" y="300" width="180" height="80" class="box"/>
+  <text x="790" y="332" class="label">Linux/macOS OS</text>
+  <text x="790" y="356" class="small">shell, filesystem</text>
+
+  <!-- Config -->
+  <rect x="270" y="210" width="240" height="140" class="box"/>
+  <text x="290" y="242" class="label">Settings (Pydantic)</text>
+  <text x="290" y="266" class="small">BOT_TOKEN, ADMIN_USER_IDS</text>
+  <text x="290" y="286" class="small">BASE_DIR, ALLOWED_SHELL_PREFIXES</text>
+  <text x="290" y="306" class="small">LOG_FILE, LOG_LEVEL, limits…</text>
+
+  <!-- Logging -->
+  <rect x="40" y="200" width="180" height="120" class="box"/>
+  <text x="60" y="232" class="label">Logging</text>
+  <text x="60" y="256" class="small">Console + Rotating file</text>
+
+  <!-- Arrows -->
+  <line x1="220" y1="120" x2="270" y2="120" class="line"/>
+  <line x1="510" y1="120" x2="540" y2="80" class="line"/>
+  <line x1="510" y1="120" x2="540" y2="180" class="line"/>
+  <line x1="740" y1="200" x2="770" y2="210" class="line"/>
+  <line x1="860" y1="260" x2="860" y2="300" class="line"/>
+  <line x1="510" y1="260" x2="540" y2="200" class="line"/>
+  <line x1="220" y1="260" x2="270" y2="260" class="line"/>
+</svg>
+

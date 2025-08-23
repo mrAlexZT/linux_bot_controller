@@ -1,0 +1,16 @@
+line-length = 100
+extend-exclude = [".venv", "__pycache__"]
+
+[lint]
+select = ["E", "F", "I", "B", "UP", "PL", "PERF"]
+ignore = ["E501"]
+
+[format]
+quote-style = "preserve"
+
+[lint.per-file-ignores]
+"tests/*" = ["S101"]
+
+[lint.isort]
+known-first-party = ["bot"]
+section-order = ["future", "standard-library", "third-party", "first-party", "local-folder"]

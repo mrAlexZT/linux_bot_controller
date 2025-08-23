@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="480" viewBox="0 0 980 480">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2d3748" />
+    </marker>
+    <style>
+      .box { fill:#f7fafc; stroke:#2d3748; stroke-width:1.6; rx:8; ry:8; }
+      .title { font: 600 16px Arial, Helvetica, sans-serif; fill:#1a202c; }
+      .small { font: 400 13px Arial, Helvetica, sans-serif; fill:#2d3748; }
+      .label { font: 600 14px Arial, Helvetica, sans-serif; fill:#2d3748; }
+      .line { stroke:#2d3748; stroke-width:1.6; marker-end:url(#arrow); }
+    </style>
+  </defs>
+
+  <text x="20" y="28" class="title">Command Flow – from Telegram message to OS action</text>
+
+  <!-- User -->
+  <rect x="40" y="70" width="200" height="70" class="box"/>
+  <text x="60" y="100" class="label">User (Admin)</text>
+  <text x="60" y="124" class="small">/sh, !cmd, /ls, /cat…</text>
+
+  <!-- Bot polling -->
+  <rect x="280" y="60" width="230" height="90" class="box"/>
+  <text x="300" y="92" class="label">Dispatcher (Polling)</text>
+  <text x="300" y="116" class="small">Receives Update</text>
+
+  <!-- Middleware -->
+  <rect x="550" y="40" width="200" height="80" class="box"/>
+  <text x="570" y="72" class="label">AdminOnlyMiddleware</text>
+  <text x="570" y="96" class="small">Access check + inject Settings</text>
+
+  <!-- Router/Handlers -->
+  <rect x="550" y="140" width="200" height="140" class="box"/>
+  <text x="570" y="168" class="label">Router → Handlers</text>
+  <text x="570" y="192" class="small">Parse command + args</text>
+  <text x="570" y="212" class="small">Allowlist check (shell)</text>
+  <text x="570" y="232" class="small">BASE_DIR path safety</text>
+
+  <!-- Utils -->
+  <rect x="790" y="160" width="170" height="110" class="box"/>
+  <text x="810" y="190" class="label">Utils</text>
+  <text x="810" y="214" class="small">run_shell()</text>
+  <text x="810" y="234" class="small">preview/file output</text>
+
+  <!-- OS -->
+  <rect x="790" y="300" width="170" height="90" class="box"/>
+  <text x="810" y="332" class="label">OS</text>
+  <text x="810" y="356" class="small">Shell + FS</text>
+
+  <!-- Logging -->
+  <rect x="280" y="190" width="230" height="80" class="box"/>
+  <text x="300" y="220" class="label">Logging</text>
+  <text x="300" y="244" class="small">Console + Rotating file</text>
+
+  <!-- Arrows -->
+  <line x1="240" y1="105" x2="280" y2="105" class="line"/>
+  <line x1="510" y1="105" x2="550" y2="80" class="line"/>
+  <line x1="510" y1="105" x2="550" y2="180" class="line"/>
+  <line x1="750" y1="210" x2="790" y2="210" class="line"/>
+  <line x1="875" y1="270" x2="875" y2="300" class="line"/>
+  <line x1="510" y1="230" x2="550" y2="210" class="line"/>
+</svg>
+

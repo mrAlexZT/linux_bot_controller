@@ -1,0 +1,14 @@
+# Bandit configuration
+# Docs: https://bandit.readthedocs.io/en/latest/config.html
+exclude_dirs:
+  - .venv
+  - __pycache__
+  - .git
+  - .github
+  - tests
+skips:
+  - B101  # assert used (we allow asserts in tests; tests are excluded already)
+  - B404  # import subprocess (aiogram/stdlib usage ok)
+  - B603  # subprocess without shell
+# Note: B602 flagged code paths are annotated with '# nosec B602' where intended.
+

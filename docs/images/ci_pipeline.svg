@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="420" viewBox="0 0 980 420">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#1f2937" />
+    </marker>
+    <style>
+      .box { fill:#f8fafc; stroke:#1f2937; stroke-width:1.4; rx:8; ry:8; }
+      .title { font: 600 16px Arial, Helvetica, sans-serif; fill:#111827; }
+      .small { font: 400 13px Arial, Helvetica, sans-serif; fill:#1f2937; }
+      .label { font: 600 14px Arial, Helvetica, sans-serif; fill:#1f2937; }
+      .line { stroke:#1f2937; stroke-width:1.4; marker-end:url(#arrow); }
+    </style>
+  </defs>
+
+  <text x="20" y="28" class="title">CI Pipeline – lint, types, tests, security</text>
+
+  <!-- Triggers -->
+  <rect x="40" y="70" width="210" height="80" class="box"/>
+  <text x="60" y="102" class="label">Trigger</text>
+  <text x="60" y="126" class="small">push / pull_request</text>
+
+  <!-- Lint -->
+  <rect x="290" y="50" width="180" height="90" class="box"/>
+  <text x="310" y="82" class="label">Lint</text>
+  <text x="310" y="106" class="small">ruff format/check</text>
+
+  <!-- Types -->
+  <rect x="500" y="50" width="180" height="90" class="box"/>
+  <text x="520" y="82" class="label">Types</text>
+  <text x="520" y="106" class="small">mypy</text>
+
+  <!-- Tests -->
+  <rect x="710" y="50" width="180" height="90" class="box"/>
+  <text x="730" y="82" class="label">Tests</text>
+  <text x="730" y="106" class="small">pytest</text>
+
+  <!-- Security -->
+  <rect x="290" y="170" width="180" height="90" class="box"/>
+  <text x="310" y="202" class="label">Security</text>
+  <text x="310" y="226" class="small">bandit</text>
+
+  <!-- Pre-commit -->
+  <rect x="500" y="170" width="180" height="90" class="box"/>
+  <text x="520" y="202" class="label">Pre-commit</text>
+  <text x="520" y="226" class="small">hooks (all files)</text>
+
+  <!-- Outcome -->
+  <rect x="710" y="170" width="180" height="90" class="box"/>
+  <text x="730" y="202" class="label">Status</text>
+  <text x="730" y="226" class="small">badges/checks</text>
+
+  <!-- Arrows -->
+  <line x1="250" y1="110" x2="290" y2="95" class="line"/>
+  <line x1="470" y1="95" x2="500" y2="95" class="line"/>
+  <line x1="680" y1="95" x2="710" y2="95" class="line"/>
+
+  <line x1="380" y1="140" x2="380" y2="170" class="line"/>
+  <line x1="590" y1="140" x2="590" y2="170" class="line"/>
+  <line x1="710" y1="215" x2="690" y2="215" class="line"/>
+</svg>
+

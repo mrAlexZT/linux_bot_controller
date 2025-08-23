@@ -1,0 +1,9 @@
+pytest==8.3.3
+pytest-asyncio==0.23.8
+ruff==0.6.9
+mypy==1.11.2
+bandit==1.7.9
+types-psutil==5.9.5.20240516
+pre-commit==3.8.0
+Pillow==11.0.0
+cairosvg==2.7.1
