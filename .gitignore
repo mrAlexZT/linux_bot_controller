@@ -13,5 +13,9 @@ __pycache__/
 .idea/
 .vscode/
 
+# Logs
+logs/
+*.log
+
 # OS
 .DS_Store
