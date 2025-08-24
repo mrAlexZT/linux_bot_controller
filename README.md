@@ -3,18 +3,7 @@
 Admin-only Telegram bot to remotely manage a Linux machine using aiogram v3.
 
 ## Diagrams
-![Architecture](docs/images/architecture.png)
-![Command flow](docs/images/command_flow.png)
-![CI pipeline](docs/images/ci_pipeline.png)
-
-> Note: If PNGs are missing or you edit the SVGs, generate PNGs with:
->
-> ```bash
-> python -m pip install -r requirements-dev.txt
-> python scripts/make_pngs.py
-> ```
->
-> Source SVGs are in docs/images/ for high-DPI scaling.
+See docs/DIAGRAMS.md
 
 Features
 - Run shell commands: /sh <cmd> and quick !<cmd>
@@ -48,6 +37,10 @@ pip install -r requirements.txt
 ```bash
 python main.py
 ```
+
+## Usage examples
+For step-by-step command examples (running shell, file operations, sysinfo, power, allowlist behavior), see:
+- docs/USAGE.md
 
 Environment variables
 - BOT_TOKEN: Telegram bot token from @BotFather
