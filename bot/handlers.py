@@ -204,7 +204,10 @@ async def cmd_ls(message: Message, settings: Settings) -> None:
         )
         return
 
-    entries = [_format_dir_entry(entry) for entry in sorted(path.iterdir(), key=lambda p: (not p.is_dir(), p.name.lower()))]
+    entries = [
+        _format_dir_entry(entry)
+        for entry in sorted(path.iterdir(), key=lambda p: (not p.is_dir(), p.name.lower()))
+    ]
     text = f"Listing {path.relative_to(settings.base_dir)}:\n" + "\n".join(entries)
     await _send_text_or_file(message, text, settings.max_text_reply_chars, prefix="ls")
 

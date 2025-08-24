@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import os
 import tempfile
 from dataclasses import dataclass
@@ -41,11 +42,8 @@ async def run_shell(cmd: str, timeout_sec: int = 20) -> CmdResult:
         stdout, stderr = await asyncio.wait_for(proc.communicate(), timeout=timeout_sec)
     except asyncio.TimeoutError:
         proc.kill()
-        try:
+        with contextlib.suppress(Exception):
             await proc.wait()
-        except Exception:
-            # Ignore wait errors on kill path
-            pass
         return CmdResult(
             returncode=124, stdout=b"", stderr=f"Timeout after {timeout_sec}s".encode()
         )

@@ -87,7 +87,7 @@ def load_settings() -> Settings:
     log_file_raw = os.getenv("LOG_FILE", "").strip()
     log_file = Path(log_file_raw).expanduser().resolve() if log_file_raw else None
     log_level = (os.getenv("LOG_LEVEL", "INFO") or "INFO").upper()
-    log_max_bytes = int(os.getenv("LOG_LOG_BYTES", str(5 * 1024 * 1024))) if False else int(os.getenv("LOG_MAX_BYTES", str(5 * 1024 * 1024)))
+    log_max_bytes = int(os.getenv("LOG_MAX_BYTES", str(5 * 1024 * 1024)))
     log_backups = int(os.getenv("LOG_BACKUPS", "5"))
 
     # Shell allowlist: normalize here for type-safety
