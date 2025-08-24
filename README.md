@@ -171,3 +171,10 @@ docker run -d --name tg_remote_bot \
 Notes:
 - The bot connects outbound to Telegram; no ports are exposed.
 - Keep ALLOW_POWER_CMDS=false in Docker; container shutdown won’t reboot the host.
+
+---
+
+<p align="center">
+   Made with ❤️ for the Ukrainian community<br>
+   <strong>Слава Україні! 🇺🇦</strong>
+</p>
