@@ -1,9 +1,10 @@
 from __future__ import annotations
 
-from typing import Any, Callable, Awaitable
+from collections.abc import Awaitable
+from typing import Any, Callable
 
 from aiogram import BaseMiddleware
-from aiogram.types import Message, CallbackQuery, Update
+from aiogram.types import CallbackQuery, Message, Update
 
 from .config import Settings
 

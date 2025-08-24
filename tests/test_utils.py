@@ -1,9 +1,8 @@
-import os
 from pathlib import Path
-import asyncio
+
 import pytest
 
-from bot.utils import run_shell, text_preview_or_file, human_bytes
+from bot.utils import human_bytes, run_shell, text_preview_or_file
 
 
 @pytest.mark.asyncio

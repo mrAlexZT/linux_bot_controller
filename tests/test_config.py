@@ -1,5 +1,5 @@
-import os
 from pathlib import Path
+
 import pytest
 
 from bot.config import _parse_admin_ids, load_settings

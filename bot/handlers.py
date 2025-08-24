@@ -1,21 +1,21 @@
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import logging
 import os
+import shlex
 from datetime import datetime, timedelta
 from pathlib import Path
-import contextlib
-import shlex
 
 import psutil
-from aiogram import Router, F
+from aiogram import F, Router
 from aiogram.filters import Command
 from aiogram.types import Message
 from aiogram.types.input_file import FSInputFile
 
 from .config import Settings
-from .utils import run_shell, text_preview_or_file, human_bytes
+from .utils import human_bytes, run_shell, text_preview_or_file
 
 router = Router(name="core")
 

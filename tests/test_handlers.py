@@ -1,9 +1,9 @@
 from pathlib import Path
-import os
+
 import pytest
 
-from bot.handlers import _is_cmd_allowed, _resolve_under, _ensure_inside
 from bot.config import Settings
+from bot.handlers import _ensure_inside, _is_cmd_allowed, _resolve_under
 
 
 def mk_settings(tmp_path: Path, allowed: set[str] | None = None) -> Settings:
