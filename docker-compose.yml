@@ -16,4 +16,3 @@ services:
       # Host data folder mounted to container /data
       - ./data:/data
     # No ports required (bot uses outbound requests to Telegram)
-
