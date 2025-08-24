@@ -140,3 +140,34 @@ jobs:
         run: |
           pre-commit install
           pre-commit run --all-files --show-diff-on-failure
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build image with cache
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          tags: tg-remote-bot:ci
+          load: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Smoke test – settings load
+        run: |
+          docker run --rm \
+            -e BOT_TOKEN="123:AAATESTTOKEN" \
+            -e ADMIN_USER_IDS="1" \
+            -e BASE_DIR="/data" \
+            tg-remote-bot:ci \
+            python -c "import os; from bot.config import load_settings; s=load_settings(); assert s.base_dir.as_posix()=='/data'; print('settings_ok')"
+
+      - name: Smoke test – compile sources
+        run: docker run --rm tg-remote-bot:ci python -m compileall -q .

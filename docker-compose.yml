@@ -1,0 +1,19 @@
+version: "3.8"
+
+services:
+  bot:
+    build: .
+    container_name: tg_remote_bot
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      # Ensure logs and BASE_DIR inside container point to the mounted volume
+      - BASE_DIR=/data
+      - LOG_FILE=/data/logs/bot.log
+      - LOG_LEVEL=INFO
+    volumes:
+      # Host data folder mounted to container /data
+      - ./data:/data
+    # No ports required (bot uses outbound requests to Telegram)
+

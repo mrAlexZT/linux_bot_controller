@@ -133,3 +133,41 @@ Test wiring notes:
 
 CI status:
 - GitHub Actions runs ruff format/lint, mypy, pytest, bandit, and pre-commit on push/PR (with pip caching) across Python 3.12/3.13.
+
+## Docker
+Prereqs: Docker and Docker Compose.
+
+1) Prepare environment file:
+```bash
+cp .env.example .env
+# edit .env and set at least:
+# BOT_TOKEN=...
+# ADMIN_USER_IDS=123456789
+```
+
+2) Run with Compose (recommended):
+```bash
+# build image and start in background
+docker compose up -d --build
+# view logs
+docker compose logs -f
+# stop
+docker compose down
+```
+- A host ./data folder is mounted to /data inside the container.
+- BASE_DIR=/data and LOG_FILE=/data/logs/bot.log are configured by compose.
+
+3) Alternatively, run with docker run:
+```bash
+docker build -t tg-remote-bot .
+docker run -d --name tg_remote_bot \
+  --restart unless-stopped \
+  --env-file .env \
+  -e BASE_DIR=/data -e LOG_FILE=/data/logs/bot.log -e LOG_LEVEL=INFO \
+  -v "$(pwd)/data:/data" \
+  tg-remote-bot
+```
+
+Notes:
+- The bot connects outbound to Telegram; no ports are exposed.
+- Keep ALLOW_POWER_CMDS=false in Docker; container shutdown won’t reboot the host.
