@@ -345,3 +345,10 @@ async def cmd_power(message: Message, settings: Settings) -> None:
     await message.answer(msg)
     # Fire-and-forget a short delay to let the message send before shutdown
     asyncio.create_task(run_shell(cmd, timeout_sec=5))
+
+
+# Fallback for unmatched plain text messages (admin users)
+@router.message(F.text & ~F.text.startswith("/") & ~F.text.startswith("!"))
+async def fallback_text(message: Message) -> None:
+    # Provide a gentle hint if a text message didn't match any command
+    await message.answer("Unknown command. Type /help for available commands.")
