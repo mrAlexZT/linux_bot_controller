@@ -6,6 +6,7 @@ from contextlib import suppress
 from logging.handlers import RotatingFileHandler
 
 from aiogram import Bot, Dispatcher
+from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from dotenv import load_dotenv
 
@@ -40,7 +41,7 @@ async def main() -> None:
         except Exception:
             logging.exception("Failed to set up file logging")
 
-    bot = Bot(token=settings.token, parse_mode=ParseMode.HTML)
+    bot = Bot(token=settings.token, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
     dp = Dispatcher()
 
     # Admin-only middleware and DI for settings
