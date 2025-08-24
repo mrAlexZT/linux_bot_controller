@@ -5,7 +5,7 @@ import pytest
 from bot.config import _parse_admin_ids, load_settings
 
 
-def test_parse_admin_ids():
+def test_parse_admin_ids() -> None:
     assert _parse_admin_ids(None) == set()
     assert _parse_admin_ids("") == set()
     assert _parse_admin_ids("123") == {123}
@@ -14,7 +14,7 @@ def test_parse_admin_ids():
     assert _parse_admin_ids("12a, 34b, 56") == {56}
 
 
-def test_load_settings_requires_token_and_admins(monkeypatch: pytest.MonkeyPatch):
+def test_load_settings_requires_token_and_admins(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.delenv("BOT_TOKEN", raising=False)
     monkeypatch.delenv("ADMIN_USER_IDS", raising=False)
     with pytest.raises(RuntimeError):
@@ -23,7 +23,7 @@ def test_load_settings_requires_token_and_admins(monkeypatch: pytest.MonkeyPatch
 
 def test_load_settings_parses_logging_and_allowlist(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
-):
+) -> None:
     monkeypatch.setenv("BOT_TOKEN", "t")
     monkeypatch.setenv("ADMIN_USER_IDS", "1,2")
     monkeypatch.setenv("BASE_DIR", str(tmp_path))

@@ -4,7 +4,7 @@ from collections.abc import Awaitable
 from typing import Any, Callable
 
 from aiogram import BaseMiddleware
-from aiogram.types import CallbackQuery, Message, Update
+from aiogram.types import CallbackQuery, Message, TelegramObject
 
 from .config import Settings
 
@@ -21,15 +21,15 @@ class AdminOnlyMiddleware(BaseMiddleware):
 
     async def __call__(
         self,
-        handler: Callable[[Update, dict[str, Any]], Awaitable[Any]],
-        event: Update,
+        handler: Callable[[TelegramObject, dict[str, Any]], Awaitable[Any]],
+        event: TelegramObject,
         data: dict[str, Any],
     ) -> Any:
         # Inject settings for handler DI
         data["settings"] = self.settings
 
-        user_id = None
-        text = None
+        user_id: int | None = None
+        text: str | None = None
 
         if isinstance(event, Message):
             if event.from_user:

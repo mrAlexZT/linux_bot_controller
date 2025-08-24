@@ -56,7 +56,7 @@ class Settings(BaseModel):
 
     @field_validator("allowed_shell_prefixes", mode="before")
     @classmethod
-    def _normalize_allowlist(cls, v) -> frozenset[str]:
+    def _normalize_allowlist(cls, v: object) -> frozenset[str]:
         if v in (None, "", set(), frozenset()):
             return frozenset()
         if isinstance(v, (set, frozenset, list, tuple)):

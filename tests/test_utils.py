@@ -6,28 +6,28 @@ from bot.utils import human_bytes, run_shell, text_preview_or_file
 
 
 @pytest.mark.asyncio
-async def test_run_shell_echo():
+async def test_run_shell_echo() -> None:
     res = await run_shell("echo hello")
     assert res.returncode == 0
     assert res.stdout.decode("utf-8").strip() == "hello"
 
 
 @pytest.mark.asyncio
-async def test_run_shell_timeout():
+async def test_run_shell_timeout() -> None:
     # sleep should exist on Linux/macOS
     res = await run_shell("sleep 2", timeout_sec=0.3)
     assert res.returncode == 124
     assert b"Timeout after" in res.stderr
 
 
-def test_text_preview_or_file_preview():
+def test_text_preview_or_file_preview() -> None:
     text = "abc" * 10
     preview, path = text_preview_or_file(text, max_chars=len(text))
     assert preview == text
     assert path is None
 
 
-def test_text_preview_or_file_file(tmp_path: Path):
+def test_text_preview_or_file_file(tmp_path: Path) -> None:
     text = "x" * 5000
     preview, path = text_preview_or_file(text, max_chars=100, filename_prefix="tst")
     assert preview is None and path
@@ -38,7 +38,7 @@ def test_text_preview_or_file_file(tmp_path: Path):
     p.unlink()
 
 
-def test_human_bytes():
+def test_human_bytes() -> None:
     assert human_bytes(0) == "0.00 B"
     assert human_bytes(1023).endswith("B")
     assert human_bytes(1024).endswith("KB")

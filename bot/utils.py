@@ -15,7 +15,7 @@ class CmdResult:
     stderr: bytes
 
 
-async def run_shell(cmd: str, timeout_sec: int = 20) -> CmdResult:
+async def run_shell(cmd: str, timeout_sec: float = 20.0) -> CmdResult:
     """Run a shell command with timeout, returning stdout/stderr as bytes.
 
     Uses bash if available for better compatibility. Falls back to /bin/sh.

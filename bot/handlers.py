@@ -72,6 +72,7 @@ async def _send_text_or_file(message: Message, text: str, max_chars: int, prefix
     if preview is not None:
         await message.answer(preview)
     else:
+        assert file_path is not None
         try:
             await message.answer_document(FSInputFile(file_path))
         finally:
@@ -291,7 +292,11 @@ async def cmd_upload(message: Message, settings: Settings) -> None:
 
     try:
         target.parent.mkdir(parents=True, exist_ok=True)
-        await message.bot.download(message.document.file_id, destination=target)
+        bot = message.bot
+        if bot is None:
+            await message.answer("Internal error: bot instance not available.")
+            return
+        await bot.download(message.document.file_id, destination=target)
     except Exception as e:
         logging.exception("Upload failed")
         await message.answer(f"Upload failed: {e}")
