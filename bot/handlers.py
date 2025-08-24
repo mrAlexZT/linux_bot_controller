@@ -9,15 +9,18 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import psutil
-from aiogram import F, Router
+from aiogram import F, Router, flags
+from aiogram.enums import ChatAction
 from aiogram.filters import Command
 from aiogram.types import Message
 from aiogram.types.input_file import FSInputFile
+from aiogram.utils.chat_action import ChatActionMiddleware
 
 from .config import Settings
 from .utils import html_escape, human_bytes, run_shell, text_preview_or_file
 
 router = Router(name="core")
+router.message.middleware(ChatActionMiddleware())
 
 
 HELP = (
@@ -109,6 +112,7 @@ def _is_cmd_allowed(cmd: str, settings: Settings) -> bool:
 
 @router.message(Command("start"))
 @router.message(Command("help"))
+@flags.chat_action(action=ChatAction.TYPING, initial_sleep=0, interval=3)
 async def cmd_help(message: Message, settings: Settings) -> None:
     lines = [
         HELP,
@@ -123,6 +127,7 @@ async def cmd_help(message: Message, settings: Settings) -> None:
 
 
 @router.message(Command("ping"))
+@flags.chat_action(action=ChatAction.TYPING, initial_sleep=0, interval=3)
 async def cmd_ping(message: Message) -> None:
     try:
         sent = message.date
@@ -134,6 +139,7 @@ async def cmd_ping(message: Message) -> None:
 
 
 @router.message(Command("whoami"))
+@flags.chat_action(action=ChatAction.TYPING, initial_sleep=0, interval=3)
 async def cmd_whoami(message: Message, settings: Settings) -> None:
     u = message.from_user
     c = message.chat
@@ -158,6 +164,7 @@ async def cmd_whoami(message: Message, settings: Settings) -> None:
 
 
 @router.message(Command("sh"))
+@flags.chat_action(action=ChatAction.TYPING, initial_sleep=0, interval=3)
 async def cmd_sh(message: Message, settings: Settings) -> None:
     args = _get_args(message)
     if not args:
@@ -191,6 +198,7 @@ async def cmd_sh(message: Message, settings: Settings) -> None:
 
 
 @router.message(F.text.startswith("!"))
+@flags.chat_action(action=ChatAction.TYPING, initial_sleep=0, interval=3)
 async def bang_shell(message: Message, settings: Settings) -> None:
     cmd = (message.text or "")[1:].strip()
     if not cmd:
@@ -232,6 +240,7 @@ def _format_dir_entry(entry: Path) -> str:
 
 
 @router.message(Command("ls"))
+@flags.chat_action(action=ChatAction.TYPING, initial_sleep=0, interval=3)
 async def cmd_ls(message: Message, settings: Settings) -> None:
     arg = _get_args(message) or "."
     path = _resolve_under(settings.base_dir, arg)
@@ -263,6 +272,7 @@ async def cmd_ls(message: Message, settings: Settings) -> None:
 
 
 @router.message(Command("cat"))
+@flags.chat_action(action=ChatAction.TYPING, initial_sleep=0, interval=3)
 async def cmd_cat(message: Message, settings: Settings) -> None:
     arg = _get_args(message)
     if not arg:
@@ -291,6 +301,7 @@ async def cmd_cat(message: Message, settings: Settings) -> None:
 
 
 @router.message(Command("download"))
+@flags.chat_action(action=ChatAction.UPLOAD_DOCUMENT, initial_sleep=0, interval=3)
 async def cmd_download(message: Message, settings: Settings) -> None:
     arg = _get_args(message)
     if not arg:
@@ -318,6 +329,7 @@ async def cmd_download(message: Message, settings: Settings) -> None:
 
 
 @router.message(Command("upload"))
+@flags.chat_action(action=ChatAction.UPLOAD_DOCUMENT, initial_sleep=0, interval=3)
 async def cmd_upload(message: Message, settings: Settings) -> None:
     if not message.document:
         await message.answer("Attach a file and use caption: /upload <target_path>")
@@ -358,6 +370,7 @@ async def cmd_upload(message: Message, settings: Settings) -> None:
 
 
 @router.message(Command("sysinfo"))
+@flags.chat_action(action=ChatAction.TYPING, initial_sleep=0, interval=3)
 async def cmd_sysinfo(message: Message) -> None:
     boot = datetime.fromtimestamp(psutil.boot_time())
     up = datetime.now() - boot
@@ -377,6 +390,7 @@ async def cmd_sysinfo(message: Message) -> None:
 
 
 @router.message(Command("power"))
+@flags.chat_action(action=ChatAction.TYPING, initial_sleep=0, interval=3)
 async def cmd_power(message: Message, settings: Settings) -> None:
     if not settings.allow_power_cmds:
         await message.answer("Power commands disabled.")
@@ -400,6 +414,7 @@ async def cmd_power(message: Message, settings: Settings) -> None:
 
 # Fallback for unmatched plain text messages (admin users)
 @router.message(F.text & ~F.text.startswith("/") & ~F.text.startswith("!"))
+@flags.chat_action(action=ChatAction.TYPING, initial_sleep=0, interval=3)
 async def fallback_text(message: Message) -> None:
     # Provide a gentle hint if a text message didn't match any command
     await message.answer("Unknown command. Type /help for available commands.")
