@@ -173,6 +173,16 @@ async def bang_shell(message: Message, settings: Settings) -> None:
     await _send_text_or_file(message, text, settings.max_text_reply_chars, prefix="cmd")
 
 
+def _format_dir_entry(entry: Path) -> str:
+    try:
+        if entry.is_dir():
+            return f"[D] {entry.name}/"
+        sz = human_bytes(entry.stat().st_size)
+        return f"[F] {entry.name} ({sz})"
+    except PermissionError:
+        return f"[?] {entry.name} <perm denied>"
+
+
 @router.message(Command("ls"))
 async def cmd_ls(message: Message, settings: Settings) -> None:
     arg = _get_args(message) or "."
@@ -194,16 +204,7 @@ async def cmd_ls(message: Message, settings: Settings) -> None:
         )
         return
 
-    entries = []
-    for entry in sorted(path.iterdir(), key=lambda p: (not p.is_dir(), p.name.lower())):
-        try:
-            if entry.is_dir():
-                entries.append(f"[D] {entry.name}/")
-            else:
-                sz = human_bytes(entry.stat().st_size)
-                entries.append(f"[F] {entry.name} ({sz})")
-        except PermissionError:
-            entries.append(f"[?] {entry.name} <perm denied>")
+    entries = [_format_dir_entry(entry) for entry in sorted(path.iterdir(), key=lambda p: (not p.is_dir(), p.name.lower()))]
     text = f"Listing {path.relative_to(settings.base_dir)}:\n" + "\n".join(entries)
     await _send_text_or_file(message, text, settings.max_text_reply_chars, prefix="ls")
 
@@ -287,7 +288,7 @@ async def cmd_upload(message: Message, settings: Settings) -> None:
 
     try:
         target.parent.mkdir(parents=True, exist_ok=True)
-        await message.bot.download(message.document, destination=target)
+        await message.bot.download(message.document.file_id, destination=target)
     except Exception as e:
         logging.exception("Upload failed")
         await message.answer(f"Upload failed: {e}")

@@ -1,31 +1,32 @@
 import os
 from pathlib import Path
-from typing import Optional, Set
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
-def _parse_admin_ids(raw: str | None) -> Set[int]:
-    ids: Set[int] = set()
+def _parse_admin_ids(raw: str | None) -> set[int]:
+    ids: set[int] = set()
     if not raw:
         return ids
     for part in raw.replace(";", ",").split(","):
-        part = part.strip()
-        if not part:
+        p = part.strip()
+        if not p:
             continue
         try:
-            ids.add(int(part))
+            ids.add(int(p))
         except ValueError:
             continue
     return ids
 
 
-class Settings(BaseModel, frozen=True):
+class Settings(BaseModel):
+    model_config = ConfigDict(frozen=True)
+
     token: str
-    admin_ids: Set[int]
+    admin_ids: set[int]
     base_dir: Path
     # Logging
-    log_file: Optional[Path] = None
+    log_file: Path | None = None
     log_level: str = "INFO"
     log_max_bytes: int = 5 * 1024 * 1024
     log_backups: int = 5
@@ -48,7 +49,7 @@ class Settings(BaseModel, frozen=True):
 
     @field_validator("log_file", mode="before")
     @classmethod
-    def _ensure_log_path(cls, v: Optional[str | Path]) -> Optional[Path]:
+    def _ensure_log_path(cls, v: str | Path | None) -> Path | None:
         if not v:
             return None
         return Path(v).expanduser().resolve()
@@ -86,11 +87,13 @@ def load_settings() -> Settings:
     log_file_raw = os.getenv("LOG_FILE", "").strip()
     log_file = Path(log_file_raw).expanduser().resolve() if log_file_raw else None
     log_level = (os.getenv("LOG_LEVEL", "INFO") or "INFO").upper()
-    log_max_bytes = int(os.getenv("LOG_MAX_BYTES", str(5 * 1024 * 1024)))
+    log_max_bytes = int(os.getenv("LOG_LOG_BYTES", str(5 * 1024 * 1024))) if False else int(os.getenv("LOG_MAX_BYTES", str(5 * 1024 * 1024)))
     log_backups = int(os.getenv("LOG_BACKUPS", "5"))
 
-    # Shell allowlist: raw string, will be normalized by validator
+    # Shell allowlist: normalize here for type-safety
     raw_allow = os.getenv("ALLOWED_SHELL_PREFIXES", "")
+    parts = (p.strip().lower() for p in str(raw_allow).replace(";", ",").split(","))
+    allowlist = frozenset(p for p in parts if p)
 
     return Settings(
         token=token,
@@ -100,7 +103,7 @@ def load_settings() -> Settings:
         log_level=log_level,
         log_max_bytes=log_max_bytes,
         log_backups=log_backups,
-        allowed_shell_prefixes=raw_allow,
+        allowed_shell_prefixes=allowlist,
         allow_power_cmds=allow_power_cmds,
         command_timeout_sec=timeout,
         max_text_reply_chars=max_chars,

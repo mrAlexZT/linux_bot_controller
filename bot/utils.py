@@ -5,7 +5,6 @@ import os
 import tempfile
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional, Tuple
 
 
 @dataclass
@@ -44,10 +43,12 @@ async def run_shell(cmd: str, timeout_sec: int = 20) -> CmdResult:
         proc.kill()
         try:
             await proc.wait()
-        finally:
-            return CmdResult(
-                returncode=124, stdout=b"", stderr=f"Timeout after {timeout_sec}s".encode()
-            )
+        except Exception:
+            # Ignore wait errors on kill path
+            pass
+        return CmdResult(
+            returncode=124, stdout=b"", stderr=f"Timeout after {timeout_sec}s".encode()
+        )
 
     return CmdResult(returncode=proc.returncode or 0, stdout=stdout or b"", stderr=stderr or b"")
 
@@ -56,7 +57,7 @@ def text_preview_or_file(
     text: str,
     max_chars: int,
     filename_prefix: str = "output",
-) -> Tuple[Optional[str], Optional[str]]:
+) -> tuple[str | None, str | None]:
     """Return either a text preview <= max_chars, or create a temp file and return its path.
 
     Returns (preview_text, file_path). Exactly one of them is non-None unless text is empty.
