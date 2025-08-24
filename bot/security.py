@@ -33,6 +33,9 @@ class AdminOnlyMiddleware(BaseMiddleware):
         if not isinstance(event, (Message, CallbackQuery)):
             return await handler(event, data)
 
+        # Narrow type for type-checkers
+        assert isinstance(event, (Message, CallbackQuery))
+
         user_id: int | None = None
         text: str | None = None
 
@@ -40,7 +43,7 @@ class AdminOnlyMiddleware(BaseMiddleware):
             if event.from_user:
                 user_id = event.from_user.id
             text = event.text or event.caption or ""
-        else:  # CallbackQuery
+        elif isinstance(event, CallbackQuery):
             if event.from_user:
                 user_id = event.from_user.id
             text = event.data or ""
@@ -55,7 +58,7 @@ class AdminOnlyMiddleware(BaseMiddleware):
             logging.warning("Access denied for user_id=%s text=%r", user_id, (text or "")[:100])
             if isinstance(event, Message):
                 await event.answer("Access denied. This bot is restricted to administrators.")
-            else:  # CallbackQuery
+            elif isinstance(event, CallbackQuery):
                 await event.answer("Access denied.", show_alert=True)
             return None
 
