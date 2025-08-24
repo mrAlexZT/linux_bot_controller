@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from collections.abc import Awaitable
 from typing import Any, Callable
 
@@ -47,6 +48,8 @@ class AdminOnlyMiddleware(BaseMiddleware):
                 return await handler(event, data)
 
         if user_id is None or user_id not in self.settings.admin_ids:
+            # Log access denial for diagnostics
+            logging.warning("Access denied for user_id=%s text=%r", user_id, (text or "")[:100])
             if isinstance(event, Message):
                 await event.answer("Access denied. This bot is restricted to administrators.")
             elif isinstance(event, CallbackQuery):

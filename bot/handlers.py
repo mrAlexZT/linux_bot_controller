@@ -109,6 +109,9 @@ def _is_cmd_allowed(cmd: str, settings: Settings) -> bool:
 @router.message(Command("help"))
 async def cmd_help(message: Message, settings: Settings) -> None:
     lines = [HELP, f"BASE_DIR: <code>{settings.base_dir}</code>"]
+    # Add a hint with the sender's user ID to simplify admin configuration
+    if message.from_user and message.from_user.id:
+        lines.append(f"Your Telegram user ID: <code>{message.from_user.id}</code>")
     await message.answer("\n".join(lines))
 
 
