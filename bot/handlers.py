@@ -168,7 +168,7 @@ async def cmd_whoami(message: Message, settings: Settings) -> None:
 async def cmd_sh(message: Message, settings: Settings) -> None:
     args = _get_args(message)
     if not args:
-        await message.answer("Usage: /sh &lt;command&gt;")
+        await message.answer("Usage: /sh <command>", parse_mode=None)
         return
     if not _is_cmd_allowed(args, settings):
         logging.warning("Command not allowed: %s", args)
@@ -305,7 +305,7 @@ async def cmd_cat(message: Message, settings: Settings) -> None:
 async def cmd_download(message: Message, settings: Settings) -> None:
     arg = _get_args(message)
     if not arg:
-        await message.answer("Usage: /download <path>")
+        await message.answer("Usage: /download <path>", parse_mode=None)
         return
     path = _resolve_under(settings.base_dir, arg)
     try:
@@ -397,7 +397,7 @@ async def cmd_power(message: Message, settings: Settings) -> None:
         return
     arg = _get_args(message).lower()
     if arg not in {"reboot", "shutdown"}:
-        await message.answer("Usage: /power <reboot|shutdown>")
+        await message.answer("Usage: /power <reboot|shutdown>", parse_mode=None)
         return
 
     if arg == "reboot":
