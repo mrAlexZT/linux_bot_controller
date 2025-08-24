@@ -2,7 +2,12 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import os
+import platform
+import socket
+import sys
 from contextlib import suppress
+from datetime import datetime, timezone
 from logging.handlers import RotatingFileHandler
 
 from aiogram import Bot, Dispatcher
@@ -10,9 +15,41 @@ from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from dotenv import load_dotenv
 
-from bot.config import load_settings
+from bot.config import Settings, load_settings
 from bot.handlers import router as core_router
 from bot.security import AdminOnlyMiddleware
+
+
+async def _notify_admins(bot: Bot, settings: Settings, text: str) -> None:
+    """Best-effort broadcast to all admin IDs; ignore per-recipient failures."""
+    tasks = [bot.send_message(uid, text) for uid in settings.admin_ids]
+    if not tasks:
+        return
+    results = await asyncio.gather(*tasks, return_exceptions=True)
+    for uid, res in zip(settings.admin_ids, results):
+        if isinstance(res, Exception):
+            logging.error("Failed to notify admin_id=%s: %s", uid, repr(res))
+
+
+def _startup_text(settings: Settings) -> str:
+    now = datetime.now(timezone.utc).astimezone()
+    host = socket.gethostname()
+    pid = os.getpid()
+    py = sys.version.split()[0]
+    sysname = platform.system()
+    return (
+        "✅ Bot started\n"
+        f"time: {now.isoformat()}\n"
+        f"host: {host} (PID {pid})\n"
+        f"python: {py} on {sysname}\n"
+        f"BASE_DIR: <code>{settings.base_dir}</code>\n"
+        f"LOG_LEVEL: {settings.log_level}"
+    )
+
+
+def _shutdown_text() -> str:
+    now = datetime.now(timezone.utc).astimezone()
+    return f"🛑 Bot stopped\ntime: {now.isoformat()}"
 
 
 async def main() -> None:
@@ -46,6 +83,16 @@ async def main() -> None:
 
     # Admin-only middleware and DI for settings
     dp.update.middleware(AdminOnlyMiddleware(settings))
+
+    # Lifecycle notifications
+    async def _on_startup(bot: Bot) -> None:
+        await _notify_admins(bot, settings, _startup_text(settings))
+
+    async def _on_shutdown(bot: Bot) -> None:
+        await _notify_admins(bot, settings, _shutdown_text())
+
+    dp.startup.register(_on_startup)
+    dp.shutdown.register(_on_shutdown)
 
     # Routers
     dp.include_router(core_router)
