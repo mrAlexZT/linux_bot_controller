@@ -189,7 +189,9 @@ async def cmd_ls(message: Message, settings: Settings) -> None:
 
     if path.is_file():
         info = path.stat()
-        await message.answer(f"FILE {path.relative_to(settings.base_dir)} ({human_bytes(info.st_size)})")
+        await message.answer(
+            f"FILE {path.relative_to(settings.base_dir)} ({human_bytes(info.st_size)})"
+        )
         return
 
     entries = []
@@ -251,7 +253,9 @@ async def cmd_download(message: Message, settings: Settings) -> None:
 
     size = path.stat().st_size
     if size > settings.max_upload_bytes:
-        await message.answer(f"File too large to upload: {human_bytes(size)} > {human_bytes(settings.max_upload_bytes)}")
+        await message.answer(
+            f"File too large to upload: {human_bytes(size)} > {human_bytes(settings.max_upload_bytes)}"
+        )
         return
 
     await message.answer_document(FSInputFile(path))
@@ -276,7 +280,9 @@ async def cmd_upload(message: Message, settings: Settings) -> None:
 
     size = message.document.file_size or 0
     if size > settings.max_upload_bytes:
-        await message.answer(f"File too large: {human_bytes(size)} > {human_bytes(settings.max_upload_bytes)}")
+        await message.answer(
+            f"File too large: {human_bytes(size)} > {human_bytes(settings.max_upload_bytes)}"
+        )
         return
 
     try:
@@ -286,7 +292,9 @@ async def cmd_upload(message: Message, settings: Settings) -> None:
         logging.exception("Upload failed")
         await message.answer(f"Upload failed: {e}")
         return
-    await message.answer(f"Saved to {target.relative_to(settings.base_dir)} ({human_bytes(target.stat().st_size)})")
+    await message.answer(
+        f"Saved to {target.relative_to(settings.base_dir)} ({human_bytes(target.stat().st_size)})"
+    )
 
 
 @router.message(Command("sysinfo"))

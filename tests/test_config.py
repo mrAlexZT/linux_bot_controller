@@ -21,7 +21,9 @@ def test_load_settings_requires_token_and_admins(monkeypatch: pytest.MonkeyPatch
         load_settings()
 
 
-def test_load_settings_parses_logging_and_allowlist(monkeypatch: pytest.MonkeyPatch, tmp_path: Path):
+def test_load_settings_parses_logging_and_allowlist(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+):
     monkeypatch.setenv("BOT_TOKEN", "t")
     monkeypatch.setenv("ADMIN_USER_IDS", "1,2")
     monkeypatch.setenv("BASE_DIR", str(tmp_path))
@@ -45,4 +47,3 @@ def test_load_settings_parses_logging_and_allowlist(monkeypatch: pytest.MonkeyPa
     assert s.log_max_bytes == 1024
     assert s.log_backups == 3
     assert s.allowed_shell_prefixes == {"ls", "echo", "uname"}
-

@@ -7,7 +7,9 @@ from bot.config import Settings
 
 
 def mk_settings(tmp_path: Path, allowed: set[str] | None = None) -> Settings:
-    return Settings(token='t', admin_ids={1}, base_dir=tmp_path, allowed_shell_prefixes=allowed or set())
+    return Settings(
+        token='t', admin_ids={1}, base_dir=tmp_path, allowed_shell_prefixes=allowed or set()
+    )
 
 
 def test_is_cmd_allowed_empty_allows_any(tmp_path: Path):
@@ -47,4 +49,3 @@ def test_ensure_inside_blocks_escape(tmp_path: Path):
     etc = Path('/etc')
     with pytest.raises(PermissionError):
         _ensure_inside(base, etc)
-

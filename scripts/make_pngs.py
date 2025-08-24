@@ -23,4 +23,3 @@ for src, dst in PAIRS:
     print(f"Converting {src.name} -> {dst.name}")
     cairosvg.svg2png(url=str(src), write_to=str(dst), output_width=980)
 print("Done.")
-

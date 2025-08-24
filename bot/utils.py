@@ -45,7 +45,9 @@ async def run_shell(cmd: str, timeout_sec: int = 20) -> CmdResult:
         try:
             await proc.wait()
         finally:
-            return CmdResult(returncode=124, stdout=b"", stderr=f"Timeout after {timeout_sec}s".encode())
+            return CmdResult(
+                returncode=124, stdout=b"", stderr=f"Timeout after {timeout_sec}s".encode()
+            )
 
     return CmdResult(returncode=proc.returncode or 0, stdout=stdout or b"", stderr=stderr or b"")
 

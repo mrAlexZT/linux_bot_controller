@@ -44,4 +44,3 @@ def test_human_bytes():
     assert human_bytes(1023).endswith("B")
     assert human_bytes(1024).endswith("KB")
     assert human_bytes(1024 * 1024).endswith("MB")
-
