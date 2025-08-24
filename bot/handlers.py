@@ -5,7 +5,7 @@ import contextlib
 import logging
 import os
 import shlex
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import psutil
@@ -15,7 +15,7 @@ from aiogram.types import Message
 from aiogram.types.input_file import FSInputFile
 
 from .config import Settings
-from .utils import human_bytes, run_shell, text_preview_or_file
+from .utils import html_escape, human_bytes, run_shell, text_preview_or_file
 
 router = Router(name="core")
 
@@ -24,14 +24,16 @@ HELP = (
     "Remote control commands:\n"
     "/start – show this message\n"
     "/help – show this message\n"
-    "/sh <cmd> – run shell command\n"
-    "!<cmd> – quick shell (prefix with exclamation)\n"
+    "/ping – quick health/latency check\n"
+    "/whoami – show your user/chat info\n"
+    "/sh &lt;cmd&gt; – run shell command\n"
+    "!&lt;cmd&gt; – quick shell (prefix with exclamation)\n"
     "/ls [path] – list directory (within BASE_DIR)\n"
-    "/cat <path> – show small file content\n"
-    "/download <path> – download a file\n"
-    "/upload <path> – send a file with this caption to upload\n"
+    "/cat &lt;path&gt; – show small file content\n"
+    "/download &lt;path&gt; – download a file\n"
+    "/upload &lt;path&gt; – send a file with this caption to upload\n"
     "/sysinfo – system info\n"
-    "/power <reboot|shutdown> – power control (if enabled)\n"
+    "/power &lt;reboot|shutdown&gt; – power control (if enabled)\n"
 )
 
 
@@ -108,39 +110,80 @@ def _is_cmd_allowed(cmd: str, settings: Settings) -> bool:
 @router.message(Command("start"))
 @router.message(Command("help"))
 async def cmd_help(message: Message, settings: Settings) -> None:
-    lines = [HELP, f"BASE_DIR: <code>{settings.base_dir}</code>"]
+    lines = [
+        HELP,
+        f"BASE_DIR: <code>{html_escape(str(settings.base_dir))}</code>",
+    ]
     # Add a hint with the sender's user ID to simplify admin configuration
     if message.from_user and message.from_user.id:
-        lines.append(f"Your Telegram user ID: <code>{message.from_user.id}</code>")
+        lines.append(
+            f"Your Telegram user ID: <code>{html_escape(str(message.from_user.id))}</code>"
+        )
     await message.answer("\n".join(lines))
+
+
+@router.message(Command("ping"))
+async def cmd_ping(message: Message) -> None:
+    try:
+        sent = message.date
+        now = datetime.now(timezone.utc)
+        latency = (now - sent).total_seconds()
+        await message.answer(f"pong ({latency:.2f}s)")
+    except Exception:
+        await message.answer("pong")
+
+
+@router.message(Command("whoami"))
+async def cmd_whoami(message: Message, settings: Settings) -> None:
+    u = message.from_user
+    c = message.chat
+    uid = str(u.id) if u else "-"
+    uname = (u.username or "-") if u else "-"
+    name = " ".join(filter(None, [u.first_name, u.last_name])) if u else "-"
+    cid = str(c.id) if c else "-"
+    ctype = c.type if c else "-"
+    is_admin = (u.id in settings.admin_ids) if u else False
+    await message.answer(
+        "\n".join(
+            [
+                f"user_id: {html_escape(uid)}",
+                f"username: {html_escape(uname)}",
+                f"name: {html_escape(name)}",
+                f"chat_id: {html_escape(cid)}",
+                f"chat_type: {html_escape(ctype)}",
+                f"admin: {is_admin}",
+            ]
+        )
+    )
 
 
 @router.message(Command("sh"))
 async def cmd_sh(message: Message, settings: Settings) -> None:
     args = _get_args(message)
     if not args:
-        await message.answer("Usage: /sh <command>")
+        await message.answer("Usage: /sh &lt;command&gt;")
         return
     if not _is_cmd_allowed(args, settings):
         logging.warning("Command not allowed: %s", args)
         await message.answer("Command not allowed by policy.")
         return
     res = await run_shell(args, timeout_sec=settings.command_timeout_sec)
-    combined = []
-    combined.append(f"$ <code>{args}</code>\n")
+    combined: list[str] = []
+    combined.append(f"$ <code>{html_escape(args)}</code>\n")
     if res.stdout:
         try:
-            combined.append(res.stdout.decode("utf-8", errors="replace"))
+            out = res.stdout.decode("utf-8", errors="replace")
         except Exception:
-            combined.append("<binary stdout>\n")
+            out = "<binary stdout>\n"
+        combined.append(f"<pre>{html_escape(out)}</pre>")
     if res.stderr:
         try:
             err = res.stderr.decode("utf-8", errors="replace")
         except Exception:
             err = "<binary stderr>\n"
         if res.stdout:
-            combined.append("\n[stderr]\n")
-        combined.append(err)
+            combined.append("\n<b>[stderr]</b>\n")
+        combined.append(f"<pre>{html_escape(err)}</pre>")
     combined.append(f"\n[exit {res.returncode}]")
 
     text = "".join(combined).strip()
@@ -157,21 +200,22 @@ async def bang_shell(message: Message, settings: Settings) -> None:
         await message.answer("Command not allowed by policy.")
         return
     res = await run_shell(cmd, timeout_sec=settings.command_timeout_sec)
-    combined = []
-    combined.append(f"$ <code>{cmd}</code>\n")
+    combined: list[str] = []
+    combined.append(f"$ <code>{html_escape(cmd)}</code>\n")
     if res.stdout:
         try:
-            combined.append(res.stdout.decode("utf-8", errors="replace"))
+            out = res.stdout.decode("utf-8", errors="replace")
         except Exception:
-            combined.append("<binary stdout>\n")
+            out = "<binary stdout>\n"
+        combined.append(f"<pre>{html_escape(out)}</pre>")
     if res.stderr:
         try:
             err = res.stderr.decode("utf-8", errors="replace")
         except Exception:
             err = "<binary stderr>\n"
         if res.stdout:
-            combined.append("\n[stderr]\n")
-        combined.append(err)
+            combined.append("\n<b>[stderr]</b>\n")
+        combined.append(f"<pre>{html_escape(err)}</pre>")
     combined.append(f"\n[exit {res.returncode}]")
     text = "".join(combined).strip()
     await _send_text_or_file(message, text, settings.max_text_reply_chars, prefix="cmd")
@@ -213,7 +257,9 @@ async def cmd_ls(message: Message, settings: Settings) -> None:
         for entry in sorted(path.iterdir(), key=lambda p: (not p.is_dir(), p.name.lower()))
     ]
     text = f"Listing {path.relative_to(settings.base_dir)}:\n" + "\n".join(entries)
-    await _send_text_or_file(message, text, settings.max_text_reply_chars, prefix="ls")
+    await _send_text_or_file(
+        message, f"<pre>{html_escape(text)}</pre>", settings.max_text_reply_chars, prefix="ls"
+    )
 
 
 @router.message(Command("cat"))
@@ -239,7 +285,9 @@ async def cmd_cat(message: Message, settings: Settings) -> None:
         await message.answer(f"Read error: {e}")
         return
 
-    await _send_text_or_file(message, data, settings.max_text_reply_chars, prefix="cat")
+    await _send_text_or_file(
+        message, f"<pre>{html_escape(data)}</pre>", settings.max_text_reply_chars, prefix="cat"
+    )
 
 
 @router.message(Command("download"))
@@ -305,7 +353,7 @@ async def cmd_upload(message: Message, settings: Settings) -> None:
         await message.answer(f"Upload failed: {e}")
         return
     await message.answer(
-        f"Saved to {target.relative_to(settings.base_dir)} ({human_bytes(target.stat().st_size)})"
+        f"Saved to <code>{html_escape(str(target.relative_to(settings.base_dir)))}</code> ({human_bytes(target.stat().st_size)})"
     )
 
 

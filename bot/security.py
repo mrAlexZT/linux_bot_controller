@@ -29,6 +29,10 @@ class AdminOnlyMiddleware(BaseMiddleware):
         # Inject settings for handler DI
         data["settings"] = self.settings
 
+        # Only enforce admin checks for Message/CallbackQuery; bypass others quietly
+        if not isinstance(event, (Message, CallbackQuery)):
+            return await handler(event, data)
+
         user_id: int | None = None
         text: str | None = None
 
@@ -36,7 +40,7 @@ class AdminOnlyMiddleware(BaseMiddleware):
             if event.from_user:
                 user_id = event.from_user.id
             text = event.text or event.caption or ""
-        elif isinstance(event, CallbackQuery):
+        else:  # CallbackQuery
             if event.from_user:
                 user_id = event.from_user.id
             text = event.data or ""
@@ -48,11 +52,10 @@ class AdminOnlyMiddleware(BaseMiddleware):
                 return await handler(event, data)
 
         if user_id is None or user_id not in self.settings.admin_ids:
-            # Log access denial for diagnostics
             logging.warning("Access denied for user_id=%s text=%r", user_id, (text or "")[:100])
             if isinstance(event, Message):
                 await event.answer("Access denied. This bot is restricted to administrators.")
-            elif isinstance(event, CallbackQuery):
+            else:  # CallbackQuery
                 await event.answer("Access denied.", show_alert=True)
             return None
 

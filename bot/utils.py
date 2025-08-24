@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import contextlib
+import html as _html
 import os
 import tempfile
 from dataclasses import dataclass
@@ -85,3 +86,8 @@ def human_bytes(n: int) -> str:
         v /= step
         i += 1
     return f"{v:.2f} {units[i]}"
+
+
+def html_escape(s: str) -> str:
+    """Escape text for Telegram HTML parse mode (escapes &, <, >)."""
+    return _html.escape(s, quote=False)
